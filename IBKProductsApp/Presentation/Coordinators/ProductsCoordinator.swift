@@ -5,8 +5,6 @@
 //  Created by Jhona Alca on 14/02/26.
 //
 
-
-// Presentation/Coordinators/ProductsCoordinator.swift
 import UIKit
 
 class ProductsCoordinator: CoordinatorProtocol {
@@ -26,6 +24,7 @@ class ProductsCoordinator: CoordinatorProtocol {
     }
     
     func showProductDetail(_ product: Product) {
-        // Implementaremos esto en el siguiente commit
+        let detailViewController = ProductDetailViewController(product: product)
+        navigationController.pushViewController(detailViewController, animated: true)
     }
 }
