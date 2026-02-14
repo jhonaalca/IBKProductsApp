@@ -23,18 +23,32 @@ class MainCoordinator: CoordinatorProtocol {
     }
     
     func start() {
-        let placeholderVC = UIViewController()
-        placeholderVC.view.backgroundColor = .white
-        placeholderVC.title = "Productos"
+        // Products coordinator
+        let productsNavController = UINavigationController()
+        let productsCoordinator = ProductsCoordinator(navigationController: productsNavController)
+        productsCoordinator.parent = self
+        childCoordinators.append(productsCoordinator)
+        productsCoordinator.start()
         
-        let placeholderNav = UINavigationController(rootViewController: placeholderVC)
-        placeholderNav.tabBarItem = UITabBarItem(
+        productsNavController.tabBarItem = UITabBarItem(
             title: "Productos",
             image: UIImage(systemName: "list.bullet"),
             selectedImage: UIImage(systemName: "list.bullet.fill")
         )
         
-        tabBarController.viewControllers = [placeholderNav]
+        // Menu Coordinator
+        let menuNavController = UINavigationController()
+        menuNavController.tabBarItem = UITabBarItem(
+            title: "Menú",
+            image: UIImage(systemName: "gear"),
+            selectedImage: UIImage(systemName: "gear.fill")
+        )
+        
+        tabBarController.viewControllers = [
+            productsNavController,
+            menuNavController
+        ]
+        
         navigationController.setViewControllers([tabBarController], animated: false)
     }
 }
