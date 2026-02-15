@@ -17,9 +17,12 @@ class MainCoordinator: CoordinatorProtocol {
     var navigationController: UINavigationController
     var childCoordinators: [CoordinatorProtocol] = []
     let tabBarController = UITabBarController()
+    private let colorRepository = ColorRepository()
     
     init(navigationController: UINavigationController) {
         self.navigationController = navigationController
+        applySavedTabBarColor()
+        setupNotifications()
     }
     
     func start() {
@@ -38,6 +41,11 @@ class MainCoordinator: CoordinatorProtocol {
         
         // Menu Coordinator
         let menuNavController = UINavigationController()
+        let menuCoordinator = MenuCoordinator(navigationController: menuNavController)
+        menuCoordinator.parent = self
+        childCoordinators.append(menuCoordinator)
+        menuCoordinator.start()
+        
         menuNavController.tabBarItem = UITabBarItem(
             title: "Menú",
             image: UIImage(systemName: "gear"),
@@ -50,5 +58,46 @@ class MainCoordinator: CoordinatorProtocol {
         ]
         
         navigationController.setViewControllers([tabBarController], animated: false)
+    }
+    
+    func updateTabBarColor(_ color: UIColor) {
+        print("🎨 Actualizando tabBar color a: \(color)")
+        tabBarController.tabBar.barTintColor = color
+        tabBarController.tabBar.isTranslucent = false
+        tabBarController.tabBar.backgroundColor = color
+        
+        // Guardar en repository
+        colorRepository.saveTabBarColor(color)
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    private func applySavedTabBarColor() {
+        if let savedColor = colorRepository.getTabBarColor() {
+            print("🎨 Aplicando color guardado al tabBar: \(savedColor)")
+            tabBarController.tabBar.barTintColor = savedColor
+            tabBarController.tabBar.isTranslucent = false
+            tabBarController.tabBar.backgroundColor = savedColor
+        } else {
+            print("🎨 Usando color por defecto")
+            tabBarController.tabBar.barTintColor = .systemBlue
+            tabBarController.tabBar.isTranslucent = false
+        }
+    }
+    
+    private func setupNotifications() {
+        // Para cuando la app vuelve de background
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleAppWillEnterForeground),
+            name: UIApplication.willEnterForegroundNotification,
+            object: nil
+        )
+    }
+    
+    @objc private func handleAppWillEnterForeground() {
+        applySavedTabBarColor()
     }
 }
