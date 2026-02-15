@@ -1,5 +1,5 @@
 //
-//  ProductsViewModelDelegate.swift
+//  ProductsViewModel.swift
 //  IBKProductsApp
 //
 //  Created by Jhona Alca on 14/02/26.
